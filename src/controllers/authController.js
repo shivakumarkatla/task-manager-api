@@ -1,7 +1,9 @@
 import crypto from 'crypto';
 
 import asyncHandler from '../utils/asyncHandler.js';
+
 import User from '../models/User.js';
+
 import generateToken from '../utils/generateToken.js';
 
 // @route   POST /api/auth/register
@@ -114,6 +116,7 @@ export const forgotPassword = asyncHandler(async (req, res) => {
    * the email exists. This prevents revealing which email
    * addresses have accounts.
    */
+
   if (!user) {
     return res.status(200).json({
       success: true,
@@ -138,12 +141,16 @@ export const forgotPassword = asyncHandler(async (req, res) => {
   await user.save({ validateBeforeSave: false });
 
   /*
-   * Development reset URL.
+   * Generate the reset URL using the deployed frontend URL
+   * stored in the FRONTEND_URL environment variable.
    *
-   * We will decide after Step 9 whether to replace this
-   * with actual email delivery.
+   * Example:
+   * https://task-manager-frontend-rouge-omega.vercel.app/reset-password/<token>
    */
-  const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
+
+  const frontendUrl = process.env.FRONTEND_URL;
+
+  const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
 
   res.status(200).json({
     success: true,
